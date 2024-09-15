@@ -4,15 +4,42 @@ import NewProject from './Components/NewProject.jsx';
 import NoProjectSelected from './Components/NoProjectSelected.jsx';
 import ProjectsSidebar from './Components/ProjectsSidebar.jsx'; 
 import SelectedProject from './Components/SelectProject.jsx';
+import NewTasks from './Components/NewTasks.jsx';
 
   function App() {
-    const [projectsState, setprojectState] = useState({
+    const [projectsState, setprojectsState] = useState({
       selectedProjectId: undefined,
-      projects: []
+      projects: [],
+      tasks: []
     });
 
+  function handleAddTask(text) {
+    setprojectsState(prevState => {
+      const taskId = Math.random();
+      const newTask = {
+        text: text,
+        projectId:prevState.selectedProjectId,
+        id: taskId,
+      };
+
+      return {
+        ...prevState,
+        tasks: [newTask, ...prevState.tasks]
+      };
+    });
+  }
+  
+  function handleDeleteTask(id) {
+    setprojectsState(prevState => {
+      return{
+        ...prevState,
+        tasks: prevState.tasks.filter((task) => task.id !== id),
+      };
+    });
+  }
+
   function handleSelectProject(id) {
-    setprojectState(preState => {
+    setprojectsState(preState => {
       return{
         ...preState,
         selectedProjectId: id,
@@ -21,7 +48,7 @@ import SelectedProject from './Components/SelectProject.jsx';
   }
 
   function handleStartAddProject() {
-    setprojectState(preState => {
+    setprojectsState(preState => {
       return{
         ...preState,
         selectedProjectId: null,
@@ -30,7 +57,7 @@ import SelectedProject from './Components/SelectProject.jsx';
   } 
 
   function handleCancelAddProject() {
-    setprojectState(preState => {
+    setprojectsState(preState => {
       return{
         ...preState,
         selectedProjectId: undefined,
@@ -39,7 +66,7 @@ import SelectedProject from './Components/SelectProject.jsx';
   }
 
   function handleAddProject(projrctData) {
-    setprojectState(prevState => {
+    setprojectsState(prevState => {
       const projectId = Math.random();
       const newProject = {
         ...projrctData,
@@ -55,7 +82,7 @@ import SelectedProject from './Components/SelectProject.jsx';
   }
 
   function handleDeleteProject () {
-    setprojectState(prevState => {
+    setprojectsState(prevState => {
       return{
         ...prevState,
         selectedProjectId: undefined,
@@ -71,7 +98,13 @@ import SelectedProject from './Components/SelectProject.jsx';
   );
 
   let content = (
-  <SelectedProject project={selectedProject} onDelete={handleDeleteProject}/>
+  <SelectedProject 
+    project={selectedProject} 
+    onDelete={handleDeleteProject} 
+    onAddTask={handleAddTask}
+    onDeleteTask={handleDeleteTask}
+    tasks={projectsState.tasks}
+  />
   );
 
   if (projectsState.selectedProjectId === null) {
@@ -86,6 +119,7 @@ import SelectedProject from './Components/SelectProject.jsx';
         onStartAddProject={handleStartAddProject} 
         projects={projectsState.projects}
         onSelectProject={handleSelectProject}
+        selectedProjectId={projectsState.selectedProjectId}
       />
       {content}
     </main>
